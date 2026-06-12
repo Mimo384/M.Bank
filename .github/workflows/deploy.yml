@@ -22,4 +22,7 @@ jobs:
           git reset --hard origin/main
           pip3 install -r requirements.txt
           pkill -f main.py || true
-          screen -S DiscordMiixBank -X stuff "python3 main.py$(printf '\r')" > /dev/null 2>&1
+          
+          # إنهاء أي عملية معلقة داخل الجلسة أولاً وتمرير أمر التشغيل الجديد بأمان
+          screen -S DiscordMiixBank -X q
+          screen -dmS DiscordMiixBank python3 main.py
