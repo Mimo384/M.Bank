@@ -23,6 +23,8 @@ jobs:
           pip3 install -r requirements.txt
           pkill -f main.py || true
           
-          # إنهاء أي عملية معلقة داخل الجلسة أولاً وتمرير أمر التشغيل الجديد بأمان
-          screen -S DiscordMiixBank -X q
-          screen -dmS DiscordMiixBank python3 main.py
+          # إغلاق الجلسة السابقة لضمان التصفير
+          screen -S DiscordMiixBank -X quit || true
+          
+          # تشغيل الجلسة الجديدة قسرياً وفصلها تماماً عن الـ SSH
+          nohup screen -dmS DiscordMiixBank python3 main.py > /dev/null 2>&1 &
