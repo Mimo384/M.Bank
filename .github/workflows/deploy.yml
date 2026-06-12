@@ -16,15 +16,12 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
+        command_timeout: 15s
         script: |
           cd ~/miixbankdiscord-bot
           git fetch origin
           git reset --hard origin/main
           pip3 install -r requirements.txt
           pkill -f main.py || true
-          
-          # إغلاق الجلسة السابقة لضمان التصفير
           screen -S DiscordMiixBank -X quit || true
-          
-          # تشغيل الجلسة الجديدة قسرياً وفصلها تماماً عن الـ SSH
-          nohup screen -dmS DiscordMiixBank python3 main.py > /dev/null 2>&1 &
+          screen -dmS DiscordMiixBank python3 main.py
