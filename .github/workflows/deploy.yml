@@ -17,7 +17,6 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          # الدخول للمجلد المعزول الآمن لحماية الأكواد الأخرى
           cd ~/M.Bank
           git fetch origin
           git reset --hard origin/main
@@ -26,5 +25,9 @@ jobs:
           # إنشاء ملف الـ .env تلقائياً وحقن التوكن بداخله بأمان
           echo "TOKEN=${{ secrets.DISCORD_TOKEN }}" > .env
           
-          pkill -f main.py || true
+          # قتل عملية البنك القديمة فقط بناءً على مسار مجلدها المخصص لحماية الـ room
+          pkill -f "python3 main.py" || true
+          pkill -f "M.Bank/main.py" || true
+          
+          # تشغيل البوت في الخلفية بأمان تسييري كامل وبدون تعليق الاتصال
           nohup python3 main.py > /dev/null 2>&1 &
