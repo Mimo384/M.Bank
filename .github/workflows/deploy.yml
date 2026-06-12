@@ -16,19 +16,17 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        command_timeout: 3m # تم رفع الوقت إلى 3 دقائق لضمان عدم حدوث تجميد أو قطع اتصال مبكر
+        command_timeout: 3m
         script: |
-          script: |
+          mkdir -p ~/miixbankdiscord-bot
           cd ~/miixbankdiscord-bot
-          git fetch origin
-          git reset --hard origin/main
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/Mimo384/M.Bank.git .
+          else
+            git fetch origin
+            git reset --hard origin/main
+          fi
           pip3 install -r requirements.txt
-          
-          # إنهاء نسخة البوت القديمة لو كانت تعمل
           pkill -f main.py || true
-          
-          # التشغيل السليم والفصل التام عن جلسة الـ SSH
           nohup python3 main.py > bot.log 2>&1 </dev/null &
-          
-          # التأكيد على نجاح السكريبت والخروج فوراً
           exit 0
