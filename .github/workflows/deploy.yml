@@ -17,7 +17,8 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          # نحن الآن في مجلد الـ root مباشرة (~)
+          # الدخول للمجلد المعزول الآمن لحماية الأكواد الأخرى
+          cd ~/M.Bank
           git fetch origin
           git reset --hard origin/main
           pip3 install -r requirements.txt
