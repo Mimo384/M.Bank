@@ -1,0 +1,24 @@
+name: Deploy Bot Automatically
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        script: |
+          cd ~/miixbankdiscord-bot
+          git pull origin main
+          pip3 install -r requirements.txt
+          pkill -f main.py || true
+          nohup python3 main.py &
