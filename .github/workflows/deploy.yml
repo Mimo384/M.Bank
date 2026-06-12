@@ -16,30 +16,14 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        # التغلب على قيود الأداة الداخلية
-        command_timeout: 15m
         script: |
-          mkdir -p ~/miixbankdiscord-bot
-          cd ~/miixbankdiscord-bot
+          # نحن الآن في مجلد الـ root مباشرة (~)
+          git fetch origin
+          git reset --hard origin/main
+          pip3 install -r requirements.txt
           
-          # تحديث الكود
-          if [ ! -d ".git" ]; then
-            git clone https://github.com/Mimo384/M.Bank.git .
-          else
-            git fetch origin
-            git reset --hard origin/main
-          fi
+          # إنشاء ملف الـ .env تلقائياً وحقن التوكن بداخله بأمان
+          echo "TOKEN=${{ secrets.DISCORD_TOKEN }}" > .env
           
-          # تثبيت سريع للمكتبات
-          pip3 install --no-cache-dir -r requirements.txt
-          
-          # إنهاء أي عمليات قديمة للبوت تماماً وبقوة
-          pkill -9 -f main.py || true
-          screen -S DiscordMixBank -X quit || true
-          sleep 1
-          
-          # الخدعة الحاسمة: تشغيل البوت داخل أقواس فرعية مع عزل كامل وإغلاق قنوات الاتصال فوراً
-          (setsid python3 main.py > bot.log 2>&1 &)
-          
-          # طباعة رسالة نجاح لإنهاء الجلسة بنظافة
-          echo "Bot triggered in isolated session successfully."
+          pkill -f main.py || true
+          nohup python3 main.py > /dev/null 2>&1 &
