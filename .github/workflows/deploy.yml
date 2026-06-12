@@ -28,5 +28,5 @@ jobs:
           fi
           pip3 install -r requirements.txt
           pkill -f main.py || true
-          nohup python3 main.py > bot.log 2>&1 </dev/null &
-          exit 0
+          screen -S DiscordMixBank -X quit || true
+          screen -L -Logfile bot.log -dmS DiscordMixBank python3 main.py
