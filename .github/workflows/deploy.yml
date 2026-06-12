@@ -16,12 +16,18 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        command_timeout: 15s
+        command_timeout: 3m # تم رفع الوقت إلى 3 دقائق لضمان عدم حدوث تجميد أو قطع اتصال مبكر
         script: |
           cd ~/miixbankdiscord-bot
           git fetch origin
           git reset --hard origin/main
           pip3 install -r requirements.txt
+          
+          # إنهاء البوت القديم لو كان يعمل
           pkill -f main.py || true
-          screen -S DiscordMiixBank -X quit || true
-          screen -dmS DiscordMiixBank python3 main.py
+          
+          # تشغيل البوت في الخلفية بشكل آمن وتوجيه المخرجات لملف log
+          nohup python3 main.py > bot.log 2>&1 &
+          
+          # إعطاء البوت ثانيتين للتشغيل للتأكد من أنه لم ينهر فوراً
+          sleep 2 
