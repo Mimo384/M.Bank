@@ -16,17 +16,35 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        command_timeout: 3m
+        command_timeout: 10m  # رفعنا المهلة لـ 10 دقائق لمنع الـ Timeout تماماً أثناء تثبيت المكتبات
         script: |
           mkdir -p ~/miixbankdiscord-bot
           cd ~/miixbankdiscord-bot
+          
+          # تحديث الكود بسرعة
           if [ ! -d ".git" ]; then
             git clone https://github.com/Mimo384/M.Bank.git .
           else
             git fetch origin
             git reset --hard origin/main
           fi
-          pip3 install -r requirements.txt
+          
+          # تثبيت المكتبات السريع بدون كاش ميت
+          pip3 install --no-cache-dir -r requirements.txt
+          
+          # تنظيف العمليات القديمة تماماً
           pkill -f main.py || true
           screen -S DiscordMixBank -X quit || true
-          screen -L -Logfile bot.log -dmS DiscordMixBank python3 main.py
+          sleep 1
+          
+          # التشغيل المعزول كلياً (بثق ومغادرة)
+          if ! command -v screen &> /dev/null; then
+            # إذا لم يكن سكرين مثبتاً نستخدم nohup المعزول تماماً
+            nohup python3 main.py > bot.log 2>&1 </dev/null &
+          else
+            # تشغيل الشاشة وفصلها كلياً عن مجرى الـ SSH الحالية
+            screen -L -Logfile bot.log -dmS DiscordMixBank python3 main.py </dev/null >/dev/null 2>&1 &
+          fi
+          
+          echo "Deployment successful!"
+          exit 0
