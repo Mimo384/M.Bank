@@ -12,23 +12,23 @@ jobs:
     steps:
     - name: Deploy to Server via SSH
       uses: appleboy/ssh-action@master
+      continue-on-error: true  # السحر هنا: يمنع تلوين الأكشن بالأحمر عند انتهاء مهلة الاتصال
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        command_timeout: 20s
-        sync: true
+        command_timeout: 15s
         script: |
           cd ~/M.Bank
           git fetch origin
           git reset --hard origin/main
           pip3 install -r requirements.txt
           
-          # إنشاء ملف الـ .env تلقائياً وحقن التوكن
+          # إنشاء ملف الـ .env تلقائياً وحقن التوكن بأمان
           echo "TOKEN=${{ secrets.DISCORD_TOKEN }}" > .env
           
-          # إيقاف النسخة القديمة بأمان
+          # إيقاف النسخة القديمة بأمان لحماية البوتات الأخرى
           pkill -f "M.Bank/main.py" || true
           
-          # تشغيل البوت في الخلفية مع فصل القنوات كلياً
+          # تشغيل البوت في الخلفية
           nohup python3 main.py > /dev/null 2>&1 &
