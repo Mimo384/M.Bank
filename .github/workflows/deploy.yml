@@ -16,18 +16,19 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
+        command_timeout: 20s
+        sync: true
         script: |
           cd ~/M.Bank
           git fetch origin
           git reset --hard origin/main
           pip3 install -r requirements.txt
           
-          # إنشاء ملف الـ .env تلقائياً وحقن التوكن بداخله بأمان
+          # إنشاء ملف الـ .env تلقائياً وحقن التوكن
           echo "TOKEN=${{ secrets.DISCORD_TOKEN }}" > .env
           
-          # قتل عملية البنك القديمة فقط بناءً على مسار مجلدها المخصص لحماية الـ room
-          pkill -f "python3 main.py" || true
+          # إيقاف النسخة القديمة بأمان
           pkill -f "M.Bank/main.py" || true
           
-          # تشغيل البوت في الخلفية بأمان تسييري كامل وبدون تعليق الاتصال
+          # تشغيل البوت في الخلفية مع فصل القنوات كلياً
           nohup python3 main.py > /dev/null 2>&1 &
